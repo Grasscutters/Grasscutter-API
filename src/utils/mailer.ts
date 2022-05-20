@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import Logger from "./logger";
-import { decrypt, getSetting } from "./utils";
+import {decrypt, getSetting} from "./utils";
 
 const transporter = (mailSettings) => {
 	return nodemailer.createTransport({

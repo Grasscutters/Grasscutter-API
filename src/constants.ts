@@ -28,3 +28,5 @@ export const URLS = {
         cultivation: RELEASES_OF("Grasscutters", "Cultivation")
     }
 };
+
+export const VALID_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

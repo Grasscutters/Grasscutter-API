@@ -1,14 +1,15 @@
+import {Request} from "express";
+
+import Snowflake, {SnowflakeOptions} from "snowflake-id";
+import settings from "../database/model/settings";
+
+import CryptoJS from "crypto-js";
+import * as constants from "../constants";
+
 /**
  * Base64 encodes an object.
  * @param data The object to encode.
  */
-import { Request } from "express";
-import Snowflake, { SnowflakeOptions } from "snowflake-id";
-import settings from "../database/model/settings";
-import CryptoJS from "crypto-js";
-import Logger from "./logger";
-import * as constants from "../constants";
-
 export function base64Encode(data: object): string {
 	return Buffer.from(JSON.stringify(data)).toString("base64");
 }
@@ -32,48 +33,63 @@ export function getAddress(request: Request): string {
 	// Check if the address is localhost.
 	if (ip == "127.0.0.1") {
 		ip = <string>request.headers["cf-connecting-ip"] || <string>request.headers["x-real-ip"] || request.ip;
-	}
-	return ip;
+	} return ip;
 }
 
-export function generateId(): String {
-	var snowflake: Snowflake = new Snowflake(<SnowflakeOptions>{
+/**
+ * Generates a random snowflake.
+ */
+export function generateId(): string {
+	const snowflake: Snowflake = new Snowflake(<SnowflakeOptions> {
 		mid: constants.MACHINE_ID,
 		offset: (2022 - 1970) * 31536000 * 1000,
-	});
-
-	return snowflake.generate();
+	}); return snowflake.generate();
 }
 
-export function toFileName(str: String): String {
-	return str.replace(/[^a-zA-Z0-9]/g, "_");
+/**
+ * Formats a string into a valid file name.
+ * @param str The string to format.
+ */
+export function formatFileName(str: string): string {
+	return str.replace(/[^a-zA-Z\d]/g, "_");
 }
 
+/**
+ * Returns the value of the setting.
+ * @param id The ID of the setting.
+ */
 export async function getSetting(id: String): Promise<any> {
-	var setting = await settings.findById(id);
-
-	if (!setting) {
+	const setting = await settings.findById(id);
+	if (!setting)
 		throw `Unable to fetch setting by the id ${id}`;
-	}
-
+	
 	return setting.value;
 }
 
-export function encrypt(str: string | String): string {
+/**
+ * Encrypts the given value.
+ * @param str The value to encrypt.
+ */
+export function encrypt(str: string): string {
 	return CryptoJS.AES.encrypt(str as string, constants.ENCRYPTION_KEY).toString();
 }
 
-export function decrypt(str: string | String): string {
-	var bytes = CryptoJS.AES.decrypt(str as string, constants.ENCRYPTION_KEY);
+/**
+ * Decrypts the given value.
+ * @param str The value to decrypt.
+ */
+export function decrypt(str: string): string {
+	const bytes = CryptoJS.AES.decrypt(str as string, constants.ENCRYPTION_KEY);
 	return bytes.toString(CryptoJS.enc.Utf8);
 }
 
-export function genRandomString(length) {
-	var result = "";
-	var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	var charactersLength = characters.length;
-	for (var i = 0; i < length; i++) {
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	}
-	return result;
+/**
+ * Generates a random string with the given length.
+ * @param length The length of the string.
+ */
+export function generateString(length: number) {
+	let result = "";
+	for (let i = 0; i < length; i++) {
+		result += constants.VALID_CHARACTERS.charAt(Math.floor(Math.random() * constants.VALID_CHARACTERS.length));
+	} return result;
 }

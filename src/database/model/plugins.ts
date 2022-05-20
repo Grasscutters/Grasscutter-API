@@ -1,5 +1,5 @@
-import mongoose, { plugin } from 'mongoose';
-import { generateId } from '../../utils/utils';
+import mongoose  from 'mongoose';
+import {generateId} from '../../utils/utils';
 
 const linkSchema = new mongoose.Schema({
     name: { Type: String },
@@ -20,12 +20,12 @@ const pluginSchema = new mongoose.Schema({
 
 const pluginModal = mongoose.model("Plugins", pluginSchema)
 
-export async function getPluginsByUserID(userId) {
-    return await pluginModal.find({ createdBy: userId });
+export async function getPluginsByUserId(userId) {
+    return pluginModal.find({createdBy: userId});
 }
 
-export async function GetPluginByID(id) {
-    return await pluginModal.findById(id);
+export async function getPluginById(id) {
+    return pluginModal.findById(id);
 }
 
 export default pluginModal;

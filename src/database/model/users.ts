@@ -1,6 +1,7 @@
-import { number } from 'joi';
-import mongoose from 'mongoose';
-import { generateId } from '../../utils/utils';
+import mongoose from "mongoose";
+
+import {number} from "joi";
+import {generateId} from "../../utils/utils";
 
 const userSchema = new mongoose.Schema({
     _id: { type: String, default: generateId() },
@@ -48,16 +49,16 @@ const userSchema = new mongoose.Schema({
 
 const userModal = mongoose.model('Users', userSchema);
 
-export async function GetUserByID(id) {
-    return await userModal.findById(id);
+export async function getUserById(id: string) {
+    return userModal.findById(id);
 }
 
-export async function GetUserByEmail(email) {
-    return await userModal.findOne({ email });
+export async function getUserByEmail(email: string) {
+    return userModal.findOne({email});
 }
 
-export async function GetUserByUsername(username) {
-    return await userModal.findOne({ username });
+export async function getUserByUsername(username: string) {
+    return userModal.findOne({username});
 }
 
 export default userModal;

@@ -18,7 +18,7 @@ export const newPluginValidation = (data) => {
                 'https'
             ]
         })
-    })
+    });
 
     const schema = Joi.object({
         name: Joi.string().required(),

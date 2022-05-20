@@ -1,4 +1,4 @@
-import winston from 'winston';
+import winston from "winston";
 import "winston-daily-rotate-file";
 
 const levels = {
@@ -30,7 +30,7 @@ const format = winston.format.combine(
 	winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
 );
 
-var fileTimestamp = new winston.transports.DailyRotateFile({
+const fileTimestamp = new winston.transports.DailyRotateFile({
 	datePattern: "YYYY-MM-DD-HH",
 	zippedArchive: true,
 	maxSize: "20m",

@@ -10,7 +10,7 @@ export function refreshEndpoint(req: Request, res: Response) {
     res.status(200).send({
         msg: "Refreshed configuration.",
         config: {}
-    })
+    });
 }
 
 /**

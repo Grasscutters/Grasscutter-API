@@ -1,23 +1,28 @@
-import express from "express";
 import {Request, Response} from "express";
-import { UploadedFile } from "express-fileupload";
-import util from "util";
-import fs, { MakeDirectoryOptions } from "fs";
+import express from "express";
 
-import Plugin, { GetPluginByID } from "../database/model/plugins";
+import {UploadedFile} from "express-fileupload";
+import {RmDirOptions} from "fs";
+import Plugin from "../database/model/plugins";
 import Logger from "../utils/logger";
-import { generateId, getSetting } from "../utils/utils";
-import { indexValidation, newPluginValidation } from "../utils/validation/pluginValidation";
-import { GetUserByID } from "../database/model/users";
-import validateToken from "../middleware/userValidator";
 
-const router : express.Router = express.Router();
+import {generateId, getSetting} from "../utils/utils";
+import {indexValidation, newPluginValidation} from "../utils/validation/pluginValidation";
+import {getUserById} from "../database/model/users";
+import {getPluginById} from "../database/model/plugins";
+import validateToken from "../middleware/userValidator";
+import {mkdirSync, rmdirSync} from "fs";
+
+import * as util from "util";
+
+const router: express.Router = express.Router();
 
 /**
+ * List all the plugins hosted on the API.
  * @route /plugins/
- * List all the plugins hosted on the API
  */
-router.get("/", async (req: Request, res: Response) => {
+
+router.get('/', async (req: Request, res: Response) => {
     let { error } = indexValidation(req.body);
     if(error) {
         Logger.error(error.details[0].message + " | " + util.inspect(req.body));
@@ -29,23 +34,27 @@ router.get("/", async (req: Request, res: Response) => {
 
     const pluginsList = await Plugin.find().limit(paginateLimit).skip((paginateLimit * page) - paginateLimit);
 
-    res.send({success: true, plugins: pluginsList});
+    res.send({
+        success: true, 
+        plugins: pluginsList
+    });
 });
 
 /**
- * @route /plugins
- * Upload a plugin to the API
+ * Upload a plugin to the API.
+ * @route /plugins/
  */
- router.post("/", validateToken, async (req: Request, res: Response) => {
-    const user = await GetUserByID((req as any).user.id);
 
-    console.log(req.body);
+router.post('/', validateToken, async (req: Request, res: Response) => {
+    const user = await getUserById((req as any).user.id);
+
+    console.log(req.body)
     if(!req.body.data) {
-        return res.send({ success: false, error: "VALIDATION_ERROR", message: "data requiredd"});
+        return res.send({ success: false, error: "VALIDATION_ERROR", message: "Data required"});
     }
 
-    var data;
-    var error;
+    let data;
+    let error;
 
     try {
         data = JSON.parse(req.body.data);
@@ -79,12 +88,12 @@ router.get("/", async (req: Request, res: Response) => {
     let versionPath = pluginPath + `/${data.version}`
     let uploadPath = versionPath + "/" + file.name;
 
-    fs.mkdirSync(versionPath, {recursive: true});    
+    mkdirSync(versionPath, {recursive: true});    
 
     file.mv(uploadPath, async (err) => {
         if(err) {
             Logger.error(`Unable to upload file '${uploadPath}'. \n` + err)
-            fs.rmdirSync(pluginPath, <fs.RmDirOptions>{recursive: true});
+            rmdirSync(pluginPath, <RmDirOptions>{recursive: true});
             return res.status(500).send({success: false, error: "UPLOAD_ERROR"});
         }
 
@@ -117,28 +126,28 @@ router.get("/", async (req: Request, res: Response) => {
             const savedPlugin = await newPlugin.save();
             return res.send({ success: true, plugin: savedPlugin });
         } catch (err) {
-            Logger.error("Unable to save plugin to database \n" + err);
-            fs.rmdirSync(pluginPath, <fs.RmDirOptions>{recursive: true});
+            Logger.error("Unable to save plugin to database.\n" + err);
+            rmdirSync(pluginPath, <RmDirOptions>{recursive: true});
             return res.send({ success: false, error: "DB_ERROR" });
         }
-
     });
 });
 
 /**
+ * Get a plugin by its ID.
  * @route /plugins/{id}
- * Get a plugin by its ID
  */
-router.get("/:id", async (req: Request, res: Response) => {
+
+router.get('/:id', async (req: Request, res: Response) => {
     let pluginId = req.params.id;
 
-    const fetchedPlugin = await GetPluginByID(pluginId);
+    const fetchedPlugin = await getPluginById(pluginId);
 
     if(!fetchedPlugin) {
         return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
     }
 
-    const user = await GetUserByID(fetchedPlugin.createdBy);
+    const user = await getUserById(fetchedPlugin.createdBy);
 
     const plugin = {
         id: fetchedPlugin._id,
@@ -153,29 +162,30 @@ router.get("/:id", async (req: Request, res: Response) => {
             id: user._id,
             username: user.username
         }
-    }
+    };
 
-    res.send({success: true, plugin });
+    res.send({success: true, plugin});
 });
 
 /**
+ * Update a plugin on the API.
  * @route /plugins/{id}
- * Update a plugin on the API
  */
- router.post("/:id", async (req: Request, res: Response) => {
-    const plugin = await GetPluginByID(req.params.id);
 
+router.post('/:id', async (req: Request, res: Response) => {
+    const plugin = await getPluginById(req.params.id);
     res.send({success: false, error: "todo..."})
 });
 
 /**
- * @route /plugins/{id}/{version}
- * Fetch specific version details.
+ * Fetch specific version details for a plugin by ID.
  * "latest" works in place of a version number to fetch the latest version
+ * @route /plugins/{id}/{version}
  */
-router.get("/:id/:version", async (req: Request, res: Response) => {
-    const plugin = await GetPluginByID(req.params.id);
-    var version;
+
+router.get('/:id/:version', async (req: Request, res: Response) => {
+    const plugin = await getPluginById(req.params.id);
+    let version;
 
     if(!plugin) {
         return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
@@ -197,13 +207,13 @@ router.get("/:id/:version", async (req: Request, res: Response) => {
 });
 
 /**
- * @route /plugins/{id}/{version}/download
- * Download the jar from the specified version.
+ * Download the plugin JAR from the specified version.
  * "latest" works in place of a version number to fetch the latest jar
+ * @route /plugins/{id}/{version}/download
  */
-router.get("/:id/:version/download", async (req: Request, res: Response) => {
-    const plugin = await GetPluginByID(req.params.id);
-    var version;
+router.get('/:id/:version/download', async (req: Request, res: Response) => {
+    const plugin = await getPluginById(req.params.id);
+    let version;
 
     if(!plugin) {
         return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
@@ -227,6 +237,5 @@ router.get("/:id/:version/download", async (req: Request, res: Response) => {
 
     return res.download(uploadPath);
 });
-
 
 export default router;

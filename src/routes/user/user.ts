@@ -1,6 +1,6 @@
 import express from "express";
-import { getPluginsByUserID } from "../../database/model/plugins";
-import { GetUserByID } from "../../database/model/users";
+import { getPluginsByUserId } from "../../database/model/plugins";
+import { getUserById } from "../../database/model/users";
 import validateToken from "../../middleware/userValidator";
 import authRoute from "./auth";
 
@@ -13,7 +13,7 @@ router.use("/auth", authRoute);
  * Get the current user from the authorization header
  */
 router.get("/@me", validateToken, async (req, res) => {
-	const user = await GetUserByID((req as any).user.id);
+	const user = await getUserById((req as any).user.id);
 
 	const you = {
 		id: user._id,
@@ -33,7 +33,7 @@ router.get("/@me", validateToken, async (req, res) => {
  * Get the specified user
  */
 router.get("/:id", async (req, res) => {
-	const user = await GetUserByID(req.params.id);
+	const user = await getUserById(req.params.id);
 
     if (!user) {
         return res.status(404).send({ success: false, error: "USER_NOT_FOUND" });
@@ -55,13 +55,13 @@ router.get("/:id", async (req, res) => {
  * Get the plugins listed by the specified user
  */
 router.get("/:id/plugins", async (req, res) => {
-    const user = await GetUserByID(req.params.id);
+    const user = await getUserById(req.params.id);
 
     if (!user) {
         return res.status(404).send({ success: false, error: "USER_NOT_FOUND" });
     }
 
-	const rawPluginList = await getPluginsByUserID(req.params.id);
+	const rawPluginList = await getPluginsByUserId(req.params.id);
     var pluginList = []
 
     // Only giving limited data since you are meant to call /plugins/:id to get more detailed information.

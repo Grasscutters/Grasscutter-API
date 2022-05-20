@@ -1,7 +1,6 @@
 import Joi from "joi";
 
 export const registerValidation = (data) => {
-
     const schema = Joi.object({
         username: Joi.string().required(),
         email: Joi.string().email().required(),
@@ -13,7 +12,6 @@ export const registerValidation = (data) => {
 };
 
 export const loginValidation = (data) => {
-
     const schema = Joi.object({
         username: Joi.string().required(),
         password: Joi.string().required(),
@@ -24,7 +22,6 @@ export const loginValidation = (data) => {
 };
 
 export const verifyTokenValidation = (data) => {
-
     const schema = Joi.object({
         token: Joi.string().required()
     });
