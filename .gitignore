@@ -6,3 +6,7 @@
 
 # Node Modules
 node_modules/
+
+# Environment
+config.json
+.env
