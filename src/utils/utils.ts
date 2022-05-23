@@ -3,6 +3,8 @@
  * @param data The object to encode.
  */
 import {Request} from "express";
+import Snowflake, {SnowflakeOptions} from "snowflake-id"
+import {loadConfig as Config} from "../config";
 
 export function base64Encode(data: object): string {
     return Buffer.from(JSON.stringify(data)).toString('base64');
@@ -28,4 +30,17 @@ export function getAddress(request: Request): string {
     if (ip == '127.0.0.1') {
         ip = (<string> request.headers['cf-connecting-ip']) || (<string> request.headers['x-real-ip']) || request.ip;
     } return ip;
+}
+
+export function generateId(): String {
+    var snowflake : Snowflake = new Snowflake(<SnowflakeOptions>{
+        mid: Config().machineId,
+        offset: (2022-1970)*31536000*1000
+    });
+
+    return snowflake.generate();
+}
+
+export function toFileName(str : String) : String {
+    return str.replace(/[^a-zA-Z0-9]/g, '_');
 }

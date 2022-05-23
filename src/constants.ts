@@ -1,5 +1,6 @@
 export const SERVER_PORT = process.env["HTTP-PORT"] || 6896;
 export const CONFIG_FILE = process.env["CONFIG-FILE"] || "config.json";
+export const MONGO_URL = process.env["MONGO-URL"] || "mongodb://localhost:27017/grasscutters";
 export const ALLOWED_IPS = (() => {
     const ips = process.env["ALLOWED-IPS"];
     return ips ? ips.split(",") : [];

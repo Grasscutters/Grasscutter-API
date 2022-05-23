@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from "express";
 import {ACCESS_DENIED, ALLOWED_IPS} from "../constants";
 
-import {getAddress} from "../utils";
+import {getAddress} from "../utils/utils";
 
 /**
  * Validates if the request is from an admin.
