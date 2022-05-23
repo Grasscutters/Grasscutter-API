@@ -1,6 +1,8 @@
 import {Request, Response, NextFunction} from "express";
 import {ACCESS_DENIED, ALLOWED_IPS} from "../constants";
 
+import {getAddress} from "../utils";
+
 /**
  * Validates if the request is from an admin.
  */
@@ -13,7 +15,7 @@ export function validateAdminEndpoints(req: Request, res: Response, next: NextFu
     }
     
     // Check if the accessor is whitelisted.
-    if(!ALLOWED_IPS.includes(req.ip))
+    if(!ALLOWED_IPS.includes(getAddress(req)))
         return res.status(403).send(ACCESS_DENIED);
     
     next(); // Call next method.
