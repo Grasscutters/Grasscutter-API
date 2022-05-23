@@ -7,6 +7,9 @@
 # Node Modules
 node_modules/
 
+# Executable Builds
+build/
+
 # Environment
 config.json
 .env

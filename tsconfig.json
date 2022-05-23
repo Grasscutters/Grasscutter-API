@@ -4,7 +4,8 @@
     "target": "es2020",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "outDir": "build"
   },
   "exclude": [
     "node_modules"
