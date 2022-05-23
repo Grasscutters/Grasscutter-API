@@ -26,6 +26,6 @@ export function getAddress(request: Request): string {
 
     // Check if the address is localhost.
     if (ip == '127.0.0.1') {
-        ip = (<string> request.headers['x-real-ip']) || request.ip;
+        ip = (<string> request.headers['cf-connecting-ip']) || (<string> request.headers['x-real-ip']) || request.ip;
     } return ip;
 }
