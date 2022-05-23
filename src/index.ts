@@ -1,11 +1,18 @@
 /* Configure 'dotenv'. */
 import "dotenv/config";
 
+/* Configure caching system. */
+import {refreshCache} from "./cache";
+refreshCache().then(() => setInterval(refreshCache, 1000 * 60 * 60));
+
+/* Load configuration. */
+require("./config").loadConfig();
+
+/* Configure HTTP. */
 import * as constants from "./constants";
 import express, {Express} from "express";
 import {createServer, Server} from "http";
 
-/* Express instance. */
 const app: Express = express();
 
 /* Configure middleware. */

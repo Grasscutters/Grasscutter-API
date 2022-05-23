@@ -11,4 +11,5 @@ export function loadConfig(): Configuration {
 
 export interface Configuration {
     bgFile: string;
+    gameVersion: string;
 }
