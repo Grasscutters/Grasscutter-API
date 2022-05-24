@@ -6,7 +6,7 @@ import fs, { MakeDirectoryOptions } from "fs";
 
 import plugin from "../database/model/plugins";
 import Logger from "../utils/logger";
-import { generateId } from "../utils/utils";
+import { generateId, getSetting } from "../utils/utils";
 import { indexValidation, newPluginValidation } from "../utils/validation/pluginValidation";
 
 const router : express.Router = express.Router();
@@ -19,7 +19,7 @@ router.get("/", async (req: Request, res: Response) => {
     let { error } = indexValidation(req.body);
     if(error) {
         Logger.error(error.details[0].message + " | " + util.inspect(req.body));
-        return res.send({ success: false, error: error.details[0].message});
+        return res.send({ success: false, error: "VALIDATION_ERROR", message:  error.details[0].message});
     }
 
     let paginateLimit : number = parseInt(req.body.paginateLimit as string) || 20;
@@ -37,6 +37,7 @@ router.get("/", async (req: Request, res: Response) => {
  router.post("/", async (req: Request, res: Response) => {
     let data;
     let error;
+
     if(typeof req.body.data != "undefined") {
         data = JSON.parse(req.body.data);
         error = newPluginValidation(data).error;
@@ -44,12 +45,17 @@ router.get("/", async (req: Request, res: Response) => {
         data = JSON.parse(req.body);
         error = newPluginValidation(data).error;
     }
+
     if(error) {
         Logger.error(error.details[0].message + " | " + util.inspect(data));
-        return res.send({ success: false, error: error.details[0].message});
+        return res.send({ success: false, error: "VALIDATION_ERROR", message: error.details[0].message});
     }
 
-    if(Object.keys(req.files).length == 0 || typeof req.files.pluginJar == 'undefined') {
+    if((await getSetting("PLUGINS_UPLOAD_ENABLED")) == false) {
+        return res.send({ success: false, error: "PLUGIN_UPLOAD_DISABLED" });
+    }
+
+    if(Object.keys(req.files).length == 0 || typeof req.files.pluginJar == 'undefined' || !req.files.pluginJar) {
         return res.send({ success: false, error: "MISSING_FILE"});
     }
 
@@ -59,15 +65,16 @@ router.get("/", async (req: Request, res: Response) => {
     }
 
     let pluginId = generateId();
-    let pluginPath = process.cwd() + `/data/plugins/${pluginId}/${data.version}`;
-    let uploadPath = pluginPath + "/" + file.name;
+    let pluginPath = process.cwd() + `/data/plugins/${pluginId}`;
+    let versionPath = pluginPath + `/${data.version}`
+    let uploadPath = versionPath + "/" + file.name;
 
-    fs.mkdirSync(pluginPath, {recursive: true});    
+    fs.mkdirSync(versionPath, {recursive: true});    
 
-    file.mv(uploadPath, (err) => {
+    file.mv(uploadPath, async (err) => {
         if(err) {
             Logger.error(`Unable to upload file '${uploadPath}'. \n` + err)
-            fs.rmdirSync(pluginPath);
+            fs.rmdirSync(pluginPath, <fs.RmDirOptions>{recursive: true});
             return res.status(500).send({success: false, error: "UPLOAD_ERROR"});
         }
 
@@ -94,10 +101,16 @@ router.get("/", async (req: Request, res: Response) => {
             createdBy: "todo"
         });
         console.log(data.links)
+        
+        try {
+            const savedPlugin = await newPlugin.save();
+            return res.send({ success: true, plugin: savedPlugin });
+        } catch (err) {
+            Logger.error("Unable to save plugin to database \n" + error);
+            fs.rmdirSync(pluginPath, <fs.RmDirOptions>{recursive: true});
+            return res.send({ success: false, error: "DB_ERROR" });
+        }
 
-        newPlugin.save();
-
-        res.send({ success: true, plugin: newPlugin });
     });
 });
 

@@ -26,7 +26,7 @@ const pluginSchema = new mongoose.Schema({
     latestVersion: { type: String },
     versions: {},
     links: [linkSchema],
-    createdBy: { type: String, index: true }
+    createdBy: { type: String, index: true, ref: "Users" }
 });
 
 export default mongoose.model("Plugins", pluginSchema);

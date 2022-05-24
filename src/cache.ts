@@ -3,6 +3,7 @@ import fetch, {Response} from "node-fetch";
 
 import {URLS} from "./constants";
 import {config} from "./config";
+import { getSetting } from "./utils/utils";
 
 /* Initialize empty cache. */
 export let cache: Cache = {commits: {gc_stable: [], gc_dev: [], cultivation: []}, version: {gc_stable: "", cultivation: "", game: ""}};
@@ -24,5 +25,5 @@ export async function refreshCache() {
         cache.version[repo] = latestRelease["tag_name"];
     }
     
-    cache.version.game = config.gameVersion || "2.6";
+    cache.version.game = await getSetting("CULTIVATION_GAMEVERSION") as string;
 }

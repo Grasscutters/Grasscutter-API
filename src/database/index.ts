@@ -18,8 +18,8 @@ mongoose.connection.on('disconnected', function() {
     Logger.log("warn", chalk.red("[MongoDB] ") + chalk.redBright("Connection to the MongoDB database has been closed"))
 });
 
-export const connect = (connectionURL) => {
-    mongoose.connect(connectionURL, <mongoose.ConnectOptions> { useNewUrlParser: true, useUnifiedTopology: true, keepAlive: true }).catch(() => {});
+export const connect = async (connectionURL) => {
+    await mongoose.connect(connectionURL, <mongoose.ConnectOptions> { useNewUrlParser: true, useUnifiedTopology: true, keepAlive: true }).catch(() => {});
 }
 
 export const connection = () => {

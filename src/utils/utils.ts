@@ -5,6 +5,8 @@
 import {Request} from "express";
 import Snowflake, {SnowflakeOptions} from "snowflake-id"
 import {loadConfig as Config} from "../config";
+import settings from "../database/model/settings";
+import Logger from "./logger";
 
 export function base64Encode(data: object): string {
     return Buffer.from(JSON.stringify(data)).toString('base64');
@@ -43,4 +45,24 @@ export function generateId(): String {
 
 export function toFileName(str : String) : String {
     return str.replace(/[^a-zA-Z0-9]/g, '_');
+}
+
+export async function getSetting(id : String) : Promise<String | Number | Boolean> {
+    var setting = await settings.findById(id);
+    
+    if(!setting) {
+        throw `Unable to fetch setting by the id ${id}`;
+    }
+
+    if(setting.type === "boolean") {
+        return setting.value.toLowerCase() === "true" ? true : false;
+    } else if (setting.type === "string") {
+        return setting.value;
+    } else if (setting.type === "number") {
+        return parseInt(setting.value);
+    } else if (setting.type === "float") {
+        return parseFloat(setting.value);
+    }
+
+    throw `Invalid type for setting ${id}`;
 }

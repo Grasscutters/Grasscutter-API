@@ -2,15 +2,17 @@ import {Express, Request, Response} from "express";
 import cultivation from "./cultivation";
 import * as configuration from "./configuration";
 import plugins from "./plugins";
+import user from "./user/user";
 
 export function configureApp(app: Express): void {
     app.get('/', indexEndpoint);
 
     app.use("/cultivation", cultivation)
     app.use("/plugins", plugins)
+    app.use("/user", user);
     
-    app.post('/configuration/refresh', configuration.refreshEndpoint);
-    app.patch('/configuration/update', configuration.updateEndpoint);
+    /*app.post('/configuration/refresh', configuration.refreshEndpoint);
+    app.patch('/configuration/update', configuration.updateEndpoint);*/
 }
 
 /**
