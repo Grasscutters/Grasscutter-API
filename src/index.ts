@@ -31,12 +31,23 @@ console.log(chalk.green(figlet.textSync("Grasscutter-API")));
 
 function startServer() {
     database.connect(constants.MONGO_URL);
-    
+
     // Configure Middleware
     app.use(morganLogger);
     app.use(helmet());
     app.use(bodyParser.json());
     app.use(fileUpload());
+
+    // TEST
+    app.get("/test", (req, res) => {
+		res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+		res.sendFile(path.join(__dirname, "../frontend/index.html"));
+	});
+
+    app.get("/axios.min.js", (req, res) => {
+		res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+		res.sendFile(path.join(__dirname, "../frontend/axios.min.js"));
+	});
 
     // Import the router.
     Router.configureApp(app);

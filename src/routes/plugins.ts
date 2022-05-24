@@ -35,13 +35,21 @@ router.get("/", async (req: Request, res: Response) => {
  * Upload a plugin to the API
  */
  router.post("/", async (req: Request, res: Response) => {
-    let { error } = newPluginValidation(req.body);
+    let data;
+    let error;
+    if(typeof req.body.data != "undefined") {
+        data = JSON.parse(req.body.data);
+        error = newPluginValidation(data).error;
+    } else {
+        data = JSON.parse(req.body);
+        error = newPluginValidation(data).error;
+    }
     if(error) {
-        Logger.error(error.details[0].message + " | " + util.inspect(req.body));
+        Logger.error(error.details[0].message + " | " + util.inspect(data));
         return res.send({ success: false, error: error.details[0].message});
     }
 
-    if(!req.files.pluginJar) {
+    if(Object.keys(req.files).length == 0 || typeof req.files.pluginJar == 'undefined') {
         return res.send({ success: false, error: "MISSING_FILE"});
     }
 
@@ -51,9 +59,8 @@ router.get("/", async (req: Request, res: Response) => {
     }
 
     let pluginId = generateId();
-    let pluginPath = process.cwd() + `/data/plugins/${pluginId}/${req.body.version}`;
+    let pluginPath = process.cwd() + `/data/plugins/${pluginId}/${data.version}`;
     let uploadPath = pluginPath + "/" + file.name;
-
 
     fs.mkdirSync(pluginPath, {recursive: true});    
 
@@ -66,14 +73,15 @@ router.get("/", async (req: Request, res: Response) => {
 
         let newPlugin = new plugin({
             _id: pluginId,
-            name: req.body.name,
-            description: req.body.description,
+            name: data.name,
+            description: data.description,
             dateReleased: Date.now(),
-            latestVersion: req.body.version,
+            latestVersion: data.version,
             versions: {
-                [req.body.version]: {
-                    //version: req.body.version,
-                    changeLog: req.body.changeLog,
+                [data.version]: {
+                    changeLog: data.changeLog,
+                    testedGCVersion: data.testedGCVersion,
+                    supportedLanguages: data.supportedLanguages,
                     fileData: {
                         name: file.name,
                         mimetype: file.mimetype,
@@ -82,7 +90,7 @@ router.get("/", async (req: Request, res: Response) => {
                     }
                 }
             },
-            links: req.body.links,
+            links: data.links,
             createdBy: "todo"
         });
 
