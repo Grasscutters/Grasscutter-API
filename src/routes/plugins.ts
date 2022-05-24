@@ -93,6 +93,7 @@ router.get("/", async (req: Request, res: Response) => {
             links: data.links,
             createdBy: "todo"
         });
+        console.log(data.links)
 
         newPlugin.save();
 
@@ -105,9 +106,13 @@ router.get("/", async (req: Request, res: Response) => {
  * Get a plugin by its ID
  */
 router.get("/:id", async (req: Request, res: Response) => {
-    let pluginId : Number = parseInt(req.params.id);
+    let pluginId = req.params.id;
 
-    const fetchedPlugin = await plugin.findOne({ _id: pluginId});
+    const fetchedPlugin = await plugin.findById(pluginId);
+
+    if(!fetchedPlugin) {
+        return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
+    }
 
     res.send({success: true, plugin: fetchedPlugin });
 });
