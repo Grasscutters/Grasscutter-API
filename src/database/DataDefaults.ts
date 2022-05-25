@@ -6,7 +6,11 @@ var systemUser = {
 	email: "api@grasscutters.xyz",
 	password: "no.",
 	activated: "activated",
-	permissionLevel: "system"
+	permissionLevel: "system",
+	validation: {
+		code: "no.",
+		expiry: 0
+	}
 };
 
 var Settings = [

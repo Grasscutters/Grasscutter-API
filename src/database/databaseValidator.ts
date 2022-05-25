@@ -27,10 +27,10 @@ async function createSystemUser() {
 
 	user.save()
 		.then(async () => {
-			ConsoleLog("info", chalk.greenBright("Administrator User Created..."));
+			ConsoleLog("info", chalk.greenBright("System User Created..."));
 		})
 		.catch((error) => {
-			ConsoleLog("warn", chalk.redBright("Error creating administrator user... ") + "\n" + error + "\n");
+			ConsoleLog("error", chalk.redBright("Error creating system user... ") + "\n" + error + "\n");
 			ConsoleLog("error", chalk.redBright("Unable to continue due to missing database data... Shutting down..."));
 			process.exit(1);
 		});
@@ -48,7 +48,7 @@ async function checkSettings(data) {
 				ConsoleLog("info", chalk.greenBright(`Created setting ${data._id}...`));
 			})
 			.catch((error) => {
-				ConsoleLog("warn", chalk.redBright(`Error creating ${data._id} user... `) + "\n" + error + "\n");
+				ConsoleLog("error", chalk.redBright(`Error creating ${data._id} user... `) + "\n" + error + "\n");
 				ConsoleLog("error", chalk.redBright("Unable to continue due to missing database data... Shutting down..."));
 				process.exit(1);
 			});

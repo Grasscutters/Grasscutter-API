@@ -31,3 +31,20 @@ export const verifyTokenValidation = (data) => {
 
     return schema.validate(data);
 }
+
+export const verifyUserBodyValidation = (data) => {
+    const schema = Joi.object({
+        id: Joi.string().required(),
+        code: Joi.string().required()
+    });
+
+    return schema.validate(data);
+}
+
+export const verifyUserQueryValidation = (data) => {
+    const schema = Joi.object({
+        code: Joi.string().required()
+    });
+
+    return schema.validate(data);
+}

@@ -34,9 +34,8 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'moderator', 'admin', 'system']
     },
     validation: {
-        code: { type: String, required: true, default: "" },
-        expiry: { type: Number, required: true, default: 0 },
-        type: { type: String, required: true, default: 'disabled', enum: ['disabled', 'activation', 'email_2fa'] }
+        code: { type: String, default: "" },
+        expiry: { type: Number, default: 0 }
     },
     settings: {
         two_factor_authentication: { type: Boolean, required: true, default: false }
