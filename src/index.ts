@@ -19,7 +19,7 @@ import * as Router from "./routes/router";
 /* Configure caching system. */
 import { refreshCache } from "./cache";
 import path from "path";
-import { checkIfPopulated } from "./database/databaseValidator";
+import { checkAndPopulate } from "./database/databaseValidator";
 import { checkMaintenanceMode } from "./middleware/maintenanceMode";
 refreshCache().then(() => setInterval(refreshCache, 1000 * 60 * 60));
 
@@ -33,32 +33,32 @@ console.log(chalk.green(figlet.textSync("Grasscutter-API")));
 
 async function startServer() {
 	await database.connect(constants.MONGO_URL);
-	await checkIfPopulated(() => {
-		// Configure Middleware
-        app.use(checkMaintenanceMode);
-		app.use(validateAdminEndpoints);
-		app.use(morganLogger);
-		app.use(helmet());
-		app.use(bodyParser.json());
-		app.use(fileUpload());
+	await checkAndPopulate();
+	
+	// Configure Middleware
+	app.use(checkMaintenanceMode);
+	app.use(validateAdminEndpoints);
+	app.use(morganLogger);
+	app.use(helmet());
+	app.use(bodyParser.json());
+	app.use(fileUpload());
 
-		// TEST
-		app.get("/test", (req, res) => {
-			res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
-			res.sendFile(path.join(__dirname, "../frontend/index.html"));
-		});
+	// TEST
+	app.get("/test", (req, res) => {
+		res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+		res.sendFile(path.join(__dirname, "../frontend/index.html"));
+	});
 
-		app.get("/axios.min.js", (req, res) => {
-			res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
-			res.sendFile(path.join(__dirname, "../frontend/axios.min.js"));
-		});
+	app.get("/axios.min.js", (req, res) => {
+		res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+		res.sendFile(path.join(__dirname, "../frontend/axios.min.js"));
+	});
 
-		// Import the router.
-		Router.configureApp(app);
+	// Import the router.
+	Router.configureApp(app);
 
-		var listener: Server = app.listen(constants.SERVER_PORT, () => {
-			Logger.log("info", `Express is running on port ${(listener.address() as AddressInfo).port}`);
-		});
+	var listener: Server = app.listen(constants.SERVER_PORT, () => {
+		Logger.log("info", `Express is running on port ${(listener.address() as AddressInfo).port}`);
 	});
 }
 

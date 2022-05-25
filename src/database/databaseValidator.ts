@@ -5,7 +5,7 @@ import Users from "./model/users";
 import Settings from "./model/settings";
 import DataDefaults from "./DataDefaults";
 
-export async function checkIfPopulated(_next) {
+export async function checkAndPopulate() {
 	ConsoleLog("info", "Checking data");
 
 	const systemUser = await Users.findById(DataDefaults.systemUser._id);
@@ -17,11 +17,9 @@ export async function checkIfPopulated(_next) {
 		ConsoleLog("info", "System user exists");
 	}
 
-	DataDefaults.Settings.forEach(async (setting) => {
+	for (const setting of DataDefaults.Settings) {
 		await checkSettings(setting);
-	});
-
-	_next();
+	}
 }
 
 async function createSystemUser() {
