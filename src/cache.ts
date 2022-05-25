@@ -2,7 +2,6 @@ import {Cache} from "./interfaces";
 import fetch, {Response} from "node-fetch";
 
 import {URLS} from "./constants";
-import {config} from "./config";
 import { getSetting } from "./utils/utils";
 
 /* Initialize empty cache. */

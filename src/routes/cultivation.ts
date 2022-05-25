@@ -3,7 +3,6 @@ import {Request, Response, Router} from "express";
 import {CultivationQuery} from "../interfaces";
 import {DEFAULT_RESPONSE} from "../constants";
 
-import {config} from "../config";
 import {cache} from "../cache";
 
 import {base64Encode, getSetting} from "../utils/utils";

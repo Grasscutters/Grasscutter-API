@@ -4,10 +4,10 @@
  */
 import { Request } from "express";
 import Snowflake, { SnowflakeOptions } from "snowflake-id";
-import { loadConfig as Config } from "../config";
 import settings from "../database/model/settings";
 import CryptoJS from "crypto-js";
 import Logger from "./logger";
+import * as constants from "../constants";
 
 export function base64Encode(data: object): string {
 	return Buffer.from(JSON.stringify(data)).toString("base64");
@@ -38,7 +38,7 @@ export function getAddress(request: Request): string {
 
 export function generateId(): String {
 	var snowflake: Snowflake = new Snowflake(<SnowflakeOptions>{
-		mid: Config().machineId,
+		mid: constants.MACHINE_ID,
 		offset: (2022 - 1970) * 31536000 * 1000,
 	});
 
@@ -60,11 +60,11 @@ export async function getSetting(id: String): Promise<any> {
 }
 
 export function encrypt(str: string | String): string {
-	return CryptoJS.AES.encrypt(str as string, process.env.ENCRYPTION_KEY).toString();
+	return CryptoJS.AES.encrypt(str as string, constants.ENCRYPTION_KEY).toString();
 }
 
 export function decrypt(str: string | String): string {
-	var bytes = CryptoJS.AES.decrypt(str as string, process.env.ENCRYPTION_KEY);
+	var bytes = CryptoJS.AES.decrypt(str as string, constants.ENCRYPTION_KEY);
 	return bytes.toString(CryptoJS.enc.Utf8);
 }
 

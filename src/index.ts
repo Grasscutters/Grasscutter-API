@@ -12,7 +12,6 @@ import * as database from "./database";
 import Logger from "./utils/logger";
 import morganLogger from "./utils/morgan-logger";
 import { validateAdminEndpoints } from "./middleware/adminValidator";
-import * as Config from "./config";
 import * as constants from "./constants";
 import * as Router from "./routes/router";
 
@@ -22,9 +21,6 @@ import path from "path";
 import { checkAndPopulate } from "./database/databaseValidator";
 import { checkMaintenanceMode } from "./middleware/maintenanceMode";
 refreshCache().then(() => setInterval(refreshCache, 1000 * 60 * 60));
-
-/* Load configuration. */
-Config.loadConfig();
 
 const app: Express = express();
 

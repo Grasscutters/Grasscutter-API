@@ -2,13 +2,15 @@ import express from "express";
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import moment from "moment";
+
 import User from "../../database/model/users";
 import { registerValidation, loginValidation, verifyTokenValidation, verifyUserQueryValidation, verifyUserBodyValidation } from "../../utils/validation/authValidation";
 import Logger from "../../utils/logger";
 import { getSetting, genRandomString } from "../../utils/utils";
 import mailer from "../../utils/mailer";
 import MailHelper, { TemplateData } from "../../mail/MailHelper";
-import moment from "moment";
+import * as constants from "../../constants";
 
 const router = express.Router();
 
@@ -117,7 +119,7 @@ router.post("/login", async (req, res) => {
 		return res.send({ success: false, error: "PASSWORD_INVALID" });
 	}
 
-	var token = jwt.sign({ id: user._id, username: user.username, email: user.email, permissionLevel: user.permissionLevel }, process.env.SIGNING_SECRET, { expiresIn: req.body.remember_me ? "31d" : "1h" });
+	var token = jwt.sign({ id: user._id, username: user.username, email: user.email, permissionLevel: user.permissionLevel }, constants.SIGNING_SECRET, { expiresIn: req.body.remember_me ? "31d" : "1h" });
 	return res.send({ success: true, token: token, valid_for: req.body.remember_me ? "31d" : "1h" });
 });
 
@@ -133,7 +135,7 @@ router.all("/verify", async (req, res) => {
 	} else {
 		error = verifyUserQueryValidation(req.query).error;
 		try {
-			data = await jwt.verify(req.query.code as string, process.env.SIGNING_SECRET);
+			data = await jwt.verify(req.query.code as string, constants.SIGNING_SECRET);
 		} catch {
 			return res.send({ success: false, error: "VERIFY_ERROR" });
 		}
@@ -183,7 +185,7 @@ router.post("/verifyToken", async (req, res) => {
 	}
 
 	try {
-		const verified = jwt.verify(req.body.token, process.env.SIGNING_SECRET);
+		const verified = jwt.verify(req.body.token, constants.SIGNING_SECRET);
 		return res.send({ success: true, error: "" });
 	} catch (err) {
 		return res.send({ success: false, error: "Token not valid", error_code: "INVALID_TOKEN" });
@@ -195,7 +197,7 @@ async function sendWelcomeMail(savedUser) {
 		MailHelper.ReplaceTemplateString(MailHelper.ReadEmailFromTemplate("verifyUser"), [
 			<TemplateData>{ templateString: "username", newString: savedUser.username }, 
 			<TemplateData>{ templateString: "code", newString: savedUser.validation.code }, 
-			<TemplateData>{ templateString: "link", newString: process.env["WEBSITE-URL"] + "/user/auth/verify?code=" + jwt.sign({ id: savedUser._id, code: savedUser.validation.code }, process.env.SIGNING_SECRET, { expiresIn: "30min" }) }
+			<TemplateData>{ templateString: "link", newString: process.env["WEBSITE-URL"] + "/user/auth/verify?code=" + jwt.sign({ id: savedUser._id, code: savedUser.validation.code }, constants.SIGNING_SECRET, { expiresIn: "30min" }) }
 		])
 	);
 }
