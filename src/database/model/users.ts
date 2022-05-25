@@ -1,3 +1,4 @@
+import { number } from 'joi';
 import mongoose from 'mongoose';
 import { generateId } from '../../utils/utils';
 
@@ -32,9 +33,16 @@ const userSchema = new mongoose.Schema({
         default: 'user',
         enum: ['user', 'moderator', 'admin', 'system']
     },
+    validation: {
+        code: { type: String, required: true, default: "" },
+        expiry: { type: Number, required: true, default: 0 },
+        type: { type: String, required: true, default: 'disabled', enum: ['disabled', 'activation', 'email_2fa'] }
+    },
+    settings: {
+        two_factor_authentication: { type: Boolean, required: true, default: false }
+    },
     dateCreated: {
-        type: Date,
-        required: true,
+        type: Number, 
         default: Date.now()
     }
 });

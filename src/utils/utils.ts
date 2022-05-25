@@ -6,6 +6,7 @@ import {Request} from "express";
 import Snowflake, {SnowflakeOptions} from "snowflake-id"
 import {loadConfig as Config} from "../config";
 import settings from "../database/model/settings";
+import CryptoJS from "crypto-js";
 import Logger from "./logger";
 
 export function base64Encode(data: object): string {
@@ -47,22 +48,21 @@ export function toFileName(str : String) : String {
     return str.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-export async function getSetting(id : String) : Promise<String | Number | Boolean> {
+export async function getSetting(id : String) : Promise<any> {
     var setting = await settings.findById(id);
     
     if(!setting) {
         throw `Unable to fetch setting by the id ${id}`;
     }
 
-    if(setting.type === "boolean") {
-        return setting.value.toLowerCase() === "true" ? true : false;
-    } else if (setting.type === "string") {
-        return setting.value;
-    } else if (setting.type === "number") {
-        return parseInt(setting.value);
-    } else if (setting.type === "float") {
-        return parseFloat(setting.value);
-    }
+    return setting.value;
+}
 
-    throw `Invalid type for setting ${id}`;
+export function encrypt(str : string | String) : string {
+    return CryptoJS.AES.encrypt(str as string, process.env.ENCRYPTION_KEY).toString();
+}
+
+export function decrypt(str : string | String) : string {
+    var bytes = CryptoJS.AES.decrypt(str as string, process.env.ENCRYPTION_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
 }
