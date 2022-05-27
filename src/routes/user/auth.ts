@@ -14,6 +14,10 @@ import * as constants from "../../constants";
 
 const router = express.Router();
 
+/**
+ * @route /user/auth/register
+ * Register a new user
+ */
 router.post("/register", async (req, res) => {
 	const { error } = registerValidation(req.body);
 	if (error) {
@@ -66,6 +70,10 @@ router.post("/register", async (req, res) => {
 	}
 });
 
+/**
+ * @route /user/auth/login
+ * Login to an account.
+ */
 router.post("/login", async (req, res) => {
 	const { error } = loginValidation(req.body);
 	if (error) {
@@ -123,7 +131,12 @@ router.post("/login", async (req, res) => {
 	return res.send({ success: true, token: token, valid_for: req.body.remember_me ? "31d" : "1h" });
 });
 
-router.all("/verify", async (req, res) => {
+/**
+ * @route /user/auth/activate
+ * Activate an account using a code sent via email
+ */
+// Set to all because this can be a post and get request because of the two different modes. Plus I'm lazy lol
+router.all("/activate", async (req, res) => {
 	const bodyMode = req.body.code ? true : false;
 
 	var error;
@@ -178,6 +191,7 @@ router.all("/verify", async (req, res) => {
 	}
 });
 
+// This probably isn't needed because of the middleware. Highly out of date
 /*router.post("/verifyToken", async (req, res) => {
 	const { error } = verifyTokenValidation(req.body);
 	if (error) {
@@ -197,7 +211,7 @@ export async function sendWelcomeMail(savedUser) {
 		MailHelper.ReplaceTemplateString(MailHelper.ReadEmailFromTemplate("verifyUser"), [
 			<TemplateData>{ templateString: "username", newString: savedUser.username }, 
 			<TemplateData>{ templateString: "code", newString: savedUser.validation.code }, 
-			<TemplateData>{ templateString: "link", newString: process.env["WEBSITE-URL"] + "/user/auth/verify?code=" + jwt.sign({ id: savedUser._id, code: savedUser.validation.code }, constants.SIGNING_SECRET, { expiresIn: "30min" }) }
+			<TemplateData>{ templateString: "link", newString: process.env["WEBSITE-URL"] + "/user/auth/activate?code=" + jwt.sign({ id: savedUser._id, code: savedUser.validation.code }, constants.SIGNING_SECRET, { expiresIn: "30min" }) }
 		])
 	);
 }

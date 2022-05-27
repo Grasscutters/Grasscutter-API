@@ -168,6 +168,11 @@ router.get("/:id", async (req: Request, res: Response) => {
     res.send({success: false, error: "todo..."})
 });
 
+/**
+ * @route /plugins/{id}/{version}
+ * Fetch specific version details.
+ * "latest" works in place of a version number to fetch the latest version
+ */
 router.get("/:id/:version", async (req: Request, res: Response) => {
     const plugin = await GetPluginByID(req.params.id);
     var version;
@@ -192,15 +197,24 @@ router.get("/:id/:version", async (req: Request, res: Response) => {
 });
 
 /**
- * @route /plugins/{id}/{version}
- * Get the jar from 
+ * @route /plugins/{id}/{version}/download
+ * Download the jar from the specified version.
+ * "latest" works in place of a version number to fetch the latest jar
  */
 router.get("/:id/:version/download", async (req: Request, res: Response) => {
     const plugin = await GetPluginByID(req.params.id);
-    const version = plugin.versions[req.params.version];
+    var version;
 
     if(!plugin) {
         return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
+    }
+
+    if(req.params.version == "latest") {
+        version = plugin.versions[plugin.latestVersion];
+        version.versionNumber = plugin.latestVersion;
+    } else {
+        version = plugin.versions[req.params.version];
+        version.versionNumber = req.params.version;
     }
 
     if(!version) {
@@ -208,7 +222,7 @@ router.get("/:id/:version/download", async (req: Request, res: Response) => {
     }
 
     let pluginPath = process.cwd() + `/data/plugins/${plugin._id}`;
-    let versionPath = pluginPath + `/${req.params.version}`;
+    let versionPath = pluginPath + `/${version.versionNumber}`;
     let uploadPath = versionPath + "/" + version.fileData.name;
 
     return res.download(uploadPath);

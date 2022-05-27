@@ -8,6 +8,10 @@ const router: express.Router = express.Router();
 
 router.use("/auth", authRoute);
 
+/**
+ * @route /user/@me
+ * Get the current user from the authorization header
+ */
 router.get("/@me", validateToken, async (req, res) => {
 	const user = await GetUserByID((req as any).user.id);
 
@@ -24,6 +28,10 @@ router.get("/@me", validateToken, async (req, res) => {
 	return res.send({ success: true, user: you });
 });
 
+/**
+ * @route /user/:id
+ * Get the specified user
+ */
 router.get("/:id", async (req, res) => {
 	const user = await GetUserByID(req.params.id);
 
@@ -42,6 +50,10 @@ router.get("/:id", async (req, res) => {
     return res.send({ success: true, user: public_user });
 });
 
+/**
+ * @route /user/:id
+ * Get the plugins listed by the specified user
+ */
 router.get("/:id/plugins", async (req, res) => {
     const user = await GetUserByID(req.params.id);
 
@@ -52,6 +64,7 @@ router.get("/:id/plugins", async (req, res) => {
 	const rawPluginList = await getPluginsByUserID(req.params.id);
     var pluginList = []
 
+    // Only giving limited data since you are meant to call /plugins/:id to get more detailed information.
     for(let plugin of rawPluginList) {
         pluginList.push({
             id: plugin._id,
