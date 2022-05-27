@@ -1,4 +1,5 @@
 import express from "express";
+import { getPluginsByUserID } from "../../database/model/plugins";
 import { GetUserByID } from "../../database/model/users";
 import validateToken from "../../middleware/userValidator";
 import authRoute from "./auth";
@@ -42,9 +43,27 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/plugins", async (req, res) => {
-	const user = await GetUserByID(req.params.id);
+    const user = await GetUserByID(req.params.id);
 
-    return res.send({ success: false, error: "TODO" });
+    if (!user) {
+        return res.status(404).send({ success: false, error: "USER_NOT_FOUND" });
+    }
+
+	const rawPluginList = await getPluginsByUserID(req.params.id);
+    var pluginList = []
+
+    for(let plugin of rawPluginList) {
+        pluginList.push({
+            id: plugin._id,
+            name: plugin.name,
+            summary: plugin.summary,
+            description: plugin.description,
+            dateReleased: plugin.dateReleased,
+            latestVersion: plugin.latestVersion
+        })
+    }
+
+    return res.send({ success: true, plugins: pluginList });
 });
 
 export default router;

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { plugin } from 'mongoose';
 import { generateId } from '../../utils/utils';
 
 const linkSchema = new mongoose.Schema({
@@ -8,13 +8,24 @@ const linkSchema = new mongoose.Schema({
 
 const pluginSchema = new mongoose.Schema({
     _id: { type: String, default: generateId() },
-    name: { type: String, index: true },
+    name: { type: String },
+    summary: { type: String, max: 100 },
     description: { type: String },
     dateReleased: { type: Number, default: Date.now() },
     latestVersion: { type: String },
     versions: {},
     links: [linkSchema],
-    createdBy: { type: String, index: true, ref: "Users" }
+    createdBy: { type: String, index: true }
 });
 
-export default mongoose.model("Plugins", pluginSchema);
+const pluginModal = mongoose.model("Plugins", pluginSchema)
+
+export async function getPluginsByUserID(userId) {
+    return await pluginModal.find({ createdBy: userId });
+}
+
+export async function GetPluginByID(id) {
+    return await pluginModal.findById(id);
+}
+
+export default pluginModal;

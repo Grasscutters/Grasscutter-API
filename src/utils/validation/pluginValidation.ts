@@ -23,6 +23,7 @@ export const newPluginValidation = (data) => {
     const schema = Joi.object({
         name: Joi.string().required(),
         description: Joi.string().required(),
+        summary: Joi.string().max(100),
         version: Joi.string().required(),
         testedGCVersions: Joi.array().items(Joi.string().required()).required(),
         supportedLanguages: Joi.array().items(Joi.string().required()).required(),
