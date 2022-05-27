@@ -20,6 +20,10 @@ router.post("/register", async (req, res) => {
 		return res.send({ success: false, error: "VALIDATION_ERROR", message: error.details[0].message });
 	}
 
+	if ((await getSetting("REGISTRATION_ENABLED")) == false) {
+		return res.send({ success: false, error: "REGISTRATION_DISABLED" });
+	}
+
 	//Checking if the user is already in the database
 	const emailExists = await User.findOne({ email: req.body.email });
 	const usernameExists = await User.findOne({ username: req.body.username });
@@ -68,10 +72,6 @@ router.post("/login", async (req, res) => {
 		return res.send({ success: false, error: "VALIDATION_ERROR", message: error.details[0].message });
 	}
 
-	if ((await getSetting("REGISTRATION_ENABLED")) == false) {
-		return res.send({ success: false, error: "REGISTRATION_DISABLED" });
-	}
-
 	var user;
 	var data = req.body;
 
@@ -108,7 +108,7 @@ router.post("/login", async (req, res) => {
 		return res.send({ success: false, error: "ACCOUNT_INVALID" });
 	}
 
-	if ((await getSetting("MAINTENANCE_MODE")) == true) {
+	if ((await getSetting("MAINTENANCE_MODE")) == true && user.permissionLevel == "user") {
 		return res.status(403).send({ success: false, error: "MAINTENANCE_MODE" });
 	}
 
@@ -178,7 +178,7 @@ router.all("/verify", async (req, res) => {
 	}
 });
 
-router.post("/verifyToken", async (req, res) => {
+/*router.post("/verifyToken", async (req, res) => {
 	const { error } = verifyTokenValidation(req.body);
 	if (error) {
 		return res.send({ success: false, error: error.details[0].message });
@@ -190,9 +190,9 @@ router.post("/verifyToken", async (req, res) => {
 	} catch (err) {
 		return res.send({ success: false, error: "Token not valid", error_code: "INVALID_TOKEN" });
 	}
-});
+});*/
 
-async function sendWelcomeMail(savedUser) {
+export async function sendWelcomeMail(savedUser) {
 	await mailer.sendEmail(savedUser.email, "Welcome to Grasscutters!", 
 		MailHelper.ReplaceTemplateString(MailHelper.ReadEmailFromTemplate("verifyUser"), [
 			<TemplateData>{ templateString: "username", newString: savedUser.username }, 

@@ -6,18 +6,6 @@ const linkSchema = new mongoose.Schema({
     url: { Type: String }
 }, { _id: false});
 
-/*const versionSchema = new mongoose.Schema({
-    version: { Type: String },
-    changeLog: { Type: String },
-    fileData: {
-        name: String,
-        mimetype: String,
-        size: Number,
-        md5: String
-    },
-    uploadDate: { type: Number, default: Date.now() }
-}, { _id: false});*/
-
 const pluginSchema = new mongoose.Schema({
     _id: { type: String, default: generateId() },
     name: { type: String, index: true },

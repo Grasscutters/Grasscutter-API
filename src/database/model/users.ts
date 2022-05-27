@@ -46,4 +46,18 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model('Users', userSchema);
+const userModal = mongoose.model('Users', userSchema);
+
+export async function GetUserByID(id) {
+    return await userModal.findById(id);
+}
+
+export async function GetUserByEmail(email) {
+    return await userModal.findOne({ email });
+}
+
+export async function GetUserByUsername(username) {
+    return await userModal.findOne({ username });
+}
+
+export default userModal;
