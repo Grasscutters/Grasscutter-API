@@ -32,6 +32,11 @@
     "@types/crypto-js": "^4.1.1",
     "@types/express-fileupload": "^1.2.2",
     "@types/jsonwebtoken": "^8.5.8",
+    "@types/node-fetch": "^2.6.1",
+    "@typescript-eslint/parser": "^5.26.0",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    
+    "eslint": "^8.16.0"
     "nodemon": "^2.0.16"
   },
   "main": "src/index.ts",
