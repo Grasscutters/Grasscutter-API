@@ -23,7 +23,7 @@ const pluginSchema = new mongoose.Schema({
     createdBy: { type: String, index: true }
 });
 
-const pluginModal = mongoose.model("Plugins", pluginSchema)
+const pluginModal = mongoose.model("Plugins", pluginSchema);
 
 export async function getPluginsByUserId(userId) {
     return pluginModal.find({createdBy: userId});

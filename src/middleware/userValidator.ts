@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import * as constants from '../constants'
+import * as constants from '../constants';
 
 export default function validateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -38,4 +38,4 @@ export const getBearerToken = (authHeader : string) => {
         return null;
     }
     return authHeader.split(" ")[1];
-}
+};

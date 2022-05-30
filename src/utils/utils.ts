@@ -11,7 +11,7 @@ import * as constants from "../constants";
  * @param data The object to encode.
  */
 export function base64Encode(data: object): string {
-	return Buffer.from(JSON.stringify(data)).toString("base64");
+    return Buffer.from(JSON.stringify(data)).toString("base64");
 }
 
 /**
@@ -19,7 +19,7 @@ export function base64Encode(data: object): string {
  * @param data The object to decode.
  */
 export function base64Decode(data: string): object {
-	return JSON.parse(Buffer.from(data, "base64").toString());
+    return JSON.parse(Buffer.from(data, "base64").toString());
 }
 
 /**
@@ -27,23 +27,23 @@ export function base64Decode(data: string): object {
  * @param request The request to get the IP address of.
  */
 export function getAddress(request: Request): string {
-	let ip: string = request.socket.remoteAddress;
-	ip = ip.replace("::ffff:", "");
+    let ip: string = request.socket.remoteAddress;
+    ip = ip.replace("::ffff:", "");
 
-	// Check if the address is localhost.
-	if (ip == "127.0.0.1") {
-		ip = <string>request.headers["cf-connecting-ip"] || <string>request.headers["x-real-ip"] || request.ip;
-	} return ip;
+    // Check if the address is localhost.
+    if (ip == "127.0.0.1") {
+        ip = <string>request.headers["cf-connecting-ip"] || <string>request.headers["x-real-ip"] || request.ip;
+    } return ip;
 }
 
 /**
  * Generates a random snowflake.
  */
 export function generateId(): string {
-	const snowflake: Snowflake = new Snowflake(<SnowflakeOptions> {
-		mid: constants.MACHINE_ID,
-		offset: (2022 - 1970) * 31536000 * 1000,
-	}); return snowflake.generate();
+    const snowflake: Snowflake = new Snowflake(<SnowflakeOptions> {
+        mid: constants.MACHINE_ID,
+        offset: (2022 - 1970) * 31536000 * 1000,
+    }); return snowflake.generate();
 }
 
 /**
@@ -51,19 +51,7 @@ export function generateId(): string {
  * @param str The string to format.
  */
 export function formatFileName(str: string): string {
-	return str.replace(/[^a-zA-Z\d]/g, "_");
-}
-
-/**
- * Returns the value of the setting.
- * @param id The ID of the setting.
- */
-export async function getSetting(id: String): Promise<any> {
-	const setting = await settings.findById(id);
-	if (!setting)
-		throw `Unable to fetch setting by the id ${id}`;
-	
-	return setting.value;
+    return str.replace(/[^a-zA-Z\d]/g, "_");
 }
 
 /**
@@ -71,7 +59,7 @@ export async function getSetting(id: String): Promise<any> {
  * @param str The value to encrypt.
  */
 export function encrypt(str: string): string {
-	return CryptoJS.AES.encrypt(str as string, constants.ENCRYPTION_KEY).toString();
+    return CryptoJS.AES.encrypt(str as string, constants.ENCRYPTION_KEY).toString();
 }
 
 /**
@@ -79,8 +67,8 @@ export function encrypt(str: string): string {
  * @param str The value to decrypt.
  */
 export function decrypt(str: string): string {
-	const bytes = CryptoJS.AES.decrypt(str as string, constants.ENCRYPTION_KEY);
-	return bytes.toString(CryptoJS.enc.Utf8);
+    const bytes = CryptoJS.AES.decrypt(str as string, constants.ENCRYPTION_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
 }
 
 /**
@@ -88,8 +76,8 @@ export function decrypt(str: string): string {
  * @param length The length of the string.
  */
 export function generateString(length: number) {
-	let result = "";
-	for (let i = 0; i < length; i++) {
-		result += constants.VALID_CHARACTERS.charAt(Math.floor(Math.random() * constants.VALID_CHARACTERS.length));
-	} return result;
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += constants.VALID_CHARACTERS.charAt(Math.floor(Math.random() * constants.VALID_CHARACTERS.length));
+    } return result;
 }

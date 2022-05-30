@@ -9,7 +9,7 @@ export const ALLOWED_IPS = (() => {
 })();
 
 export const COMMITS_OF = (user: string, repo: string, branch?: string) => {
-    let url: string = `https://api.github.com/repos/${user}/${repo}/commits`;
+    let url = `https://api.github.com/repos/${user}/${repo}/commits`;
     branch && (url += `?sha=${branch}`); return url;
 };
 export const RELEASES_OF = (user: string, repo: string) => `https://api.github.com/repos/${user}/${repo}/releases`;

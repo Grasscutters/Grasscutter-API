@@ -28,34 +28,34 @@ console.clear();
 console.log(chalk.green(figlet.textSync("Grasscutter-API")));
 
 async function startServer() {
-	await database.connect(constants.MONGO_URL);
-	await checkAndPopulate();
-	
-	// Configure Middleware
-	app.use(checkMaintenanceMode);
-	app.use(validateAdminEndpoints);
-	app.use(morganLogger);
-	app.use(helmet());
-	app.use(bodyParser.json());
-	app.use(fileUpload());
+    await database.connect(constants.MONGO_URL);
+    await checkAndPopulate();
 
-	// TEST
-	app.get("/test", (req, res) => {
-		res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
-		res.sendFile(path.join(__dirname, "../frontend/index.html"));
-	});
+    // Configure Middleware
+    app.use(checkMaintenanceMode);
+    app.use(validateAdminEndpoints);
+    app.use(morganLogger);
+    app.use(helmet());
+    app.use(bodyParser.json());
+    app.use(fileUpload());
 
-	app.get("/axios.min.js", (req, res) => {
-		res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
-		res.sendFile(path.join(__dirname, "../frontend/axios.min.js"));
-	});
+    // TEST
+    app.get("/test", (req, res) => {
+        res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+        res.sendFile(path.join(__dirname, "../frontend/index.html"));
+    });
 
-	// Import the router.
-	Router.configureApp(app);
+    app.get("/axios.min.js", (req, res) => {
+        res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+        res.sendFile(path.join(__dirname, "../frontend/axios.min.js"));
+    });
 
-	var listener: Server = app.listen(constants.SERVER_PORT, () => {
-		Logger.log("info", `Express is running on port ${(listener.address() as AddressInfo).port}`);
-	});
+    // Import the router.
+    Router.configureApp(app);
+
+    const listener: Server = app.listen(constants.SERVER_PORT, () => {
+        Logger.log("info", `Express is running on port ${(listener.address() as AddressInfo).port}`);
+    });
 }
 
 startServer();

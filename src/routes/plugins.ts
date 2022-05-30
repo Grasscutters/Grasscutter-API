@@ -1,19 +1,20 @@
 import {Request, Response} from "express";
 import express from "express";
+import bcrypt from "bcryptjs";
 
 import {UploadedFile} from "express-fileupload";
-import {RmDirOptions} from "fs";
+import fs from "fs";
 import Plugin from "../database/model/plugins";
 import Logger from "../utils/logger";
 
-import {generateId, getSetting} from "../utils/utils";
+import {generateId} from "../utils/utils";
 import {indexValidation, newPluginValidation} from "../utils/validation/pluginValidation";
 import {getUserById} from "../database/model/users";
 import {getPluginById} from "../database/model/plugins";
 import validateToken from "../middleware/userValidator";
-import {mkdirSync, rmdirSync} from "fs";
 
 import * as util from "util";
+import { getSetting } from "../database/model/settings";
 
 const router: express.Router = express.Router();
 
@@ -23,19 +24,19 @@ const router: express.Router = express.Router();
  */
 
 router.get('/', async (req: Request, res: Response) => {
-    let { error } = indexValidation(req.body);
+    const { error } = indexValidation(req.body);
     if(error) {
         Logger.error(error.details[0].message + " | " + util.inspect(req.body));
         return res.send({ success: false, error: "VALIDATION_ERROR", message:  error.details[0].message});
     }
 
-    let paginateLimit : number = parseInt(req.body.paginateLimit as string) || 20;
-    let page : number = parseInt(req.query.page as string) || 1;
+    const paginateLimit : number = parseInt(req.body.paginateLimit as string) || 20;
+    const page : number = parseInt(req.query.page as string) || 1;
 
     const pluginsList = await Plugin.find().limit(paginateLimit).skip((paginateLimit * page) - paginateLimit);
 
     res.send({
-        success: true, 
+        success: true,
         plugins: pluginsList
     });
 });
@@ -48,7 +49,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.post('/', validateToken, async (req: Request, res: Response) => {
     const user = await getUserById((req as any).user.id);
 
-    console.log(req.body)
+    console.log(req.body);
     if(!req.body.data) {
         return res.send({ success: false, error: "VALIDATION_ERROR", message: "Data required"});
     }
@@ -62,7 +63,7 @@ router.post('/', validateToken, async (req: Request, res: Response) => {
     } catch (e) {
         console.log(req.body);
         console.log(e);
-        return res.send({ success: false, error: "VALIDATION_ERROR", message: "Data is in an incorrect format"})
+        return res.send({ success: false, error: "VALIDATION_ERROR", message: "Data is in an incorrect format"});
     }
 
     if(error) {
@@ -78,26 +79,26 @@ router.post('/', validateToken, async (req: Request, res: Response) => {
         return res.send({ success: false, error: "MISSING_FILE"});
     }
 
-    let file = req.files.pluginJar as UploadedFile;
+    const file = req.files.pluginJar as UploadedFile;
     if(file.mimetype != 'application/java-archive') { // May add more MIME types later if people add support for other types of plugins (such as Kotlin)
         return res.status(500).send({success: false, error: "INVALID_MIME"});
     }
 
-    let pluginId = generateId();
-    let pluginPath = process.cwd() + `/data/plugins/${pluginId}`;
-    let versionPath = pluginPath + `/${data.version}`
-    let uploadPath = versionPath + "/" + file.name;
+    const pluginId = generateId();
+    const pluginPath = process.cwd() + `/data/plugins/${pluginId}`;
+    const versionPath = pluginPath + `/${data.version}`;
+    const uploadPath = versionPath + "/" + file.name;
 
-    mkdirSync(versionPath, {recursive: true});    
+    fs.mkdirSync(versionPath, {recursive: true});
 
     file.mv(uploadPath, async (err) => {
         if(err) {
-            Logger.error(`Unable to upload file '${uploadPath}'. \n` + err)
-            rmdirSync(pluginPath, <RmDirOptions>{recursive: true});
+            Logger.error(`Unable to upload file '${uploadPath}'. \n` + err);
+            fs.rmdirSync(pluginPath, <fs.RmDirOptions>{recursive: true});
             return res.status(500).send({success: false, error: "UPLOAD_ERROR"});
         }
 
-        let newPlugin = new Plugin({
+        const newPlugin = new Plugin({
             _id: pluginId,
             name: data.name,
             description: data.description,
@@ -120,14 +121,13 @@ router.post('/', validateToken, async (req: Request, res: Response) => {
             links: data.links,
             createdBy: user._id
         });
-        console.log(data.links)
-        
+
         try {
             const savedPlugin = await newPlugin.save();
             return res.send({ success: true, plugin: savedPlugin });
         } catch (err) {
             Logger.error("Unable to save plugin to database.\n" + err);
-            rmdirSync(pluginPath, <RmDirOptions>{recursive: true});
+            fs.rmdirSync(pluginPath, <fs.RmDirOptions>{recursive: true});
             return res.send({ success: false, error: "DB_ERROR" });
         }
     });
@@ -139,7 +139,7 @@ router.post('/', validateToken, async (req: Request, res: Response) => {
  */
 
 router.get('/:id', async (req: Request, res: Response) => {
-    let pluginId = req.params.id;
+    const pluginId = req.params.id;
 
     const fetchedPlugin = await getPluginById(pluginId);
 
@@ -174,7 +174,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.post('/:id', async (req: Request, res: Response) => {
     const plugin = await getPluginById(req.params.id);
-    res.send({success: false, error: "todo..."})
+    res.send({success: false, error: "todo..."});
 });
 
 /**
@@ -183,13 +183,13 @@ router.post('/:id', async (req: Request, res: Response) => {
  * The user needs to be the owner of the plugin and they must provide their password, or they must be an admin.
  */
 router.delete("/:id", validateToken, async (req: Request, res: Response) => {
-    const plugin = await GetPluginByID(req.params.id);
+    const plugin = await getPluginById(req.params.id);
 
     if(!plugin) {
         return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
     }
 
-    const user = await GetUserByID((req as any).user.id);
+    const user = await getUserById((req as any).user.id);
 
     if(user._id != plugin.createdBy || user.permissionLevel != "admin" || user.permissionLevel != "system") {
         return res.status(403).send({ success: false, error: "PERMISSION_DENIED" });
@@ -201,12 +201,14 @@ router.delete("/:id", validateToken, async (req: Request, res: Response) => {
         }
 
         //CHECK IF PASSWORD IS CORRECT
-	    const validPass = await bcrypt.compare(req.body.password.password, user.password);
+        const validPass = await bcrypt.compare(req.body.password.password, user.password);
 
-	    if (!validPass) {
-		    return res.send({ success: false, error: "PASSWORD_INVALID" });
-	    }
+        if (!validPass) {
+            return res.send({ success: false, error: "PASSWORD_INVALID" });
+        }
     }
+
+    //TODO
 
 
 });
@@ -236,7 +238,7 @@ router.get('/:id/:version', async (req: Request, res: Response) => {
     if(!version) {
         return res.status(404).send({success: false, error: "VERSION_NOT_FOUND" });
     }
-    
+
     return res.send({ success: true, version });
 });
 
@@ -265,11 +267,14 @@ router.get('/:id/:version/download', async (req: Request, res: Response) => {
         return res.status(404).send({success: false, error: "VERSION_NOT_FOUND" });
     }
 
-    let pluginPath = process.cwd() + `/data/plugins/${plugin._id}`;
-    let versionPath = pluginPath + `/${version.versionNumber}`;
-    let uploadPath = versionPath + "/" + version.fileData.name;
+    const pluginJar = `${process.cwd()}/data/plugins/${plugin._id}/${version.versionNumber}/${version.fileData.name}`;
 
-    return res.download(uploadPath);
+    if(fs.existsSync(pluginJar)) {
+        Logger.error(`${pluginJar} not found while fetching jar`);
+        return res.status(404).send({ success: false, error: "VERSION_NOT_FOUND", message: "INTERNAL" });
+    }
+
+    return res.download(pluginJar);
 });
 
 export default router;

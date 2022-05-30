@@ -11,17 +11,17 @@ mongoose.connection.on('connected', function() {
 });
 
 mongoose.connection.on('error', function(err) {
-    Logger.log("error", chalk.red("[MongoDB] ") + chalk.redBright("Connection to the MongoDB database failed: " + err))
+    Logger.log("error", chalk.red("[MongoDB] ") + chalk.redBright("Connection to the MongoDB database failed: " + err));
 });
 
 mongoose.connection.on('disconnected', function() {
-    Logger.log("warn", chalk.red("[MongoDB] ") + chalk.redBright("Connection to the MongoDB database has been closed"))
+    Logger.log("warn", chalk.red("[MongoDB] ") + chalk.redBright("Connection to the MongoDB database has been closed"));
 });
 
 export const connect = async (connectionURL) => {
-    await mongoose.connect(connectionURL, <mongoose.ConnectOptions> { useNewUrlParser: true, useUnifiedTopology: true, keepAlive: true }).catch(() => {});
-}
+    await mongoose.connect(connectionURL, <mongoose.ConnectOptions> { useNewUrlParser: true, useUnifiedTopology: true, keepAlive: true }).catch();
+};
 
 export const connection = () => {
     return mongoose.connection;
-}
+};

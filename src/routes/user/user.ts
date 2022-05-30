@@ -13,19 +13,19 @@ router.use("/auth", authRoute);
  * Get the current user from the authorization header
  */
 router.get("/@me", validateToken, async (req, res) => {
-	const user = await getUserById((req as any).user.id);
+    const user = await getUserById((req as any).user.id);
 
-	const you = {
-		id: user._id,
-		username: user.username,
-		email: user.email,
-		activated: user.activated,
-		perissionLevel: user.permissionLevel,
-		settings: user.settings,
-		dateCreated: user.dateCreated,
-	};
+    const you = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        activated: user.activated,
+        perissionLevel: user.permissionLevel,
+        settings: user.settings,
+        dateCreated: user.dateCreated,
+    };
 
-	return res.send({ success: true, user: you });
+    return res.send({ success: true, user: you });
 });
 
 /**
@@ -33,7 +33,7 @@ router.get("/@me", validateToken, async (req, res) => {
  * Get the specified user
  */
 router.get("/:id", async (req, res) => {
-	const user = await getUserById(req.params.id);
+    const user = await getUserById(req.params.id);
 
     if (!user) {
         return res.status(404).send({ success: false, error: "USER_NOT_FOUND" });
@@ -61,11 +61,11 @@ router.get("/:id/plugins", async (req, res) => {
         return res.status(404).send({ success: false, error: "USER_NOT_FOUND" });
     }
 
-	const rawPluginList = await getPluginsByUserId(req.params.id);
-    var pluginList = []
+    const rawPluginList = await getPluginsByUserId(req.params.id);
+    const pluginList = [];
 
     // Only giving limited data since you are meant to call /plugins/:id to get more detailed information.
-    for(let plugin of rawPluginList) {
+    for(const plugin of rawPluginList) {
         pluginList.push({
             id: plugin._id,
             name: plugin.name,
@@ -73,7 +73,7 @@ router.get("/:id/plugins", async (req, res) => {
             description: plugin.description,
             dateReleased: plugin.dateReleased,
             latestVersion: plugin.latestVersion
-        })
+        });
     }
 
     return res.send({ success: true, plugins: pluginList });

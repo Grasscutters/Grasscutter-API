@@ -6,10 +6,10 @@ import user from "./user/user";
 export function configureApp(app: Express): void {
     app.get('/', indexEndpoint);
 
-    app.use('/cultivation', cultivation)
-    app.use('/plugins', plugins)
+    app.use('/cultivation', cultivation);
+    app.use('/plugins', plugins);
     app.use('/user', user);
-    
+
     /*app.post('/configuration/refresh', configuration.refreshEndpoint);
     app.patch('/configuration/update', configuration.updateEndpoint);*/
 }

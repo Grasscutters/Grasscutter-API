@@ -5,7 +5,8 @@ import {CultivationQuery} from "../interfaces";
 import {DEFAULT_RESPONSE} from "../constants";
 import {cache} from "../cache";
 
-import {base64Encode, getSetting} from "../utils/utils";
+import {base64Encode} from "../utils/utils";
+import { getSetting } from "../database/model/settings";
 
 const router: Router = express.Router();
 

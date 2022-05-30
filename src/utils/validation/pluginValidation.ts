@@ -1,17 +1,16 @@
 import Joi from "joi";
-import joiFileExtensions from "joi-file-extensions";
 
 export const indexValidation = (data) => {
     const schema = Joi.object({
         paginateLimit: Joi.number()
-    }); 
+    });
 
     return schema.validate(data);
-}
+};
 
 export const newPluginValidation = (data) => {
     const links = Joi.object({
-        name: Joi.string().required(), 
+        name: Joi.string().required(),
         url: Joi.string().required().uri({
             scheme: [
                 'http',
@@ -32,7 +31,7 @@ export const newPluginValidation = (data) => {
     });
 
     return schema.validate(data);
-}
+};
 
 export const deletePluginValidation = (data) => {
     const schema = Joi.object({
@@ -40,4 +39,4 @@ export const deletePluginValidation = (data) => {
     });
 
     return schema.validate(data);
-}
+};

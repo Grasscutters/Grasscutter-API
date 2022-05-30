@@ -6,7 +6,7 @@ export const registerValidation = (data) => {
         email: Joi.string().email().required(),
         password: Joi.string().required(),
         password_confirmation: Joi.string().required()
-    }); 
+    });
 
     return schema.validate(data);
 };
@@ -16,7 +16,7 @@ export const loginValidation = (data) => {
         username: Joi.string().required(),
         password: Joi.string().required(),
         remember_me: Joi.boolean()
-    }); 
+    });
 
     return schema.validate(data);
 };
@@ -27,7 +27,7 @@ export const verifyTokenValidation = (data) => {
     });
 
     return schema.validate(data);
-}
+};
 
 export const verifyUserBodyValidation = (data) => {
     const schema = Joi.object({
@@ -36,7 +36,7 @@ export const verifyUserBodyValidation = (data) => {
     });
 
     return schema.validate(data);
-}
+};
 
 export const verifyUserQueryValidation = (data) => {
     const schema = Joi.object({
@@ -44,4 +44,4 @@ export const verifyUserQueryValidation = (data) => {
     });
 
     return schema.validate(data);
-}
+};
