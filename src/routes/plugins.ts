@@ -178,7 +178,41 @@ router.post('/:id', async (req: Request, res: Response) => {
 });
 
 /**
- * Fetch specific version details for a plugin by ID.
+ * @route /plugins/{id}
+ * Delete a plugin on the API.
+ * The user needs to be the owner of the plugin and they must provide their password, or they must be an admin.
+ */
+router.delete("/:id", validateToken, async (req: Request, res: Response) => {
+    const plugin = await GetPluginByID(req.params.id);
+
+    if(!plugin) {
+        return res.status(404).send({success: false, error: "PLUGIN_NOT_FOUND" });
+    }
+
+    const user = await GetUserByID((req as any).user.id);
+
+    if(user._id != plugin.createdBy || user.permissionLevel != "admin" || user.permissionLevel != "system") {
+        return res.status(403).send({ success: false, error: "PERMISSION_DENIED" });
+    }
+
+    if(user._id == plugin.createdBy) {
+        if(!req.body.password) {
+            return res.send({ success: false, error: "PASSWORD_REQUIRED" });
+        }
+
+        //CHECK IF PASSWORD IS CORRECT
+	    const validPass = await bcrypt.compare(req.body.password.password, user.password);
+
+	    if (!validPass) {
+		    return res.send({ success: false, error: "PASSWORD_INVALID" });
+	    }
+    }
+
+
+});
+
+/**
+ * Fetch specific version details.
  * "latest" works in place of a version number to fetch the latest version
  * @route /plugins/{id}/{version}
  */

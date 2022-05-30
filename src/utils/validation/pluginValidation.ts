@@ -33,3 +33,11 @@ export const newPluginValidation = (data) => {
 
     return schema.validate(data);
 }
+
+export const deletePluginValidation = (data) => {
+    const schema = Joi.object({
+        password: Joi.string()
+    });
+
+    return schema.validate(data);
+}

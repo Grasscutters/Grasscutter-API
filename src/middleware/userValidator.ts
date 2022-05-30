@@ -33,7 +33,7 @@ export default function validateToken(req, res, next) {
     });
 }
 
-const getBearerToken = (authHeader : string) => {
+export const getBearerToken = (authHeader : string) => {
     if(!authHeader.includes("Bearer ")) {
         return null;
     }

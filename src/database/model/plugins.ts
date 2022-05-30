@@ -15,6 +15,11 @@ const pluginSchema = new mongoose.Schema({
     latestVersion: { type: String },
     versions: {},
     links: [linkSchema],
+    deletionStatus: {
+        pendingDeletion: { type: Boolean, default: false },
+        deletionDate: { type: Number, default: 0 }
+    },
+    privacy: { type: String, default: "public", enum: ["public", "hidden", "private"]},
     createdBy: { type: String, index: true }
 });
 
