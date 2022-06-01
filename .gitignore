@@ -13,3 +13,6 @@ build/
 # Environment
 config.json
 .env
+/logs
+/data
+package-lock.json

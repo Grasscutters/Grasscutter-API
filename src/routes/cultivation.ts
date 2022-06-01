@@ -1,28 +1,35 @@
-import {Request, Response} from "express";
+import {Request, Response, Router} from "express";
+import express from "express";
+
 import {CultivationQuery} from "../interfaces";
 import {DEFAULT_RESPONSE} from "../constants";
-
-import {config} from "../config";
 import {cache} from "../cache";
 
-import {base64Encode} from "../utils";
+import {base64Encode} from "../utils/utils";
+import { getSetting } from "../database/model/settings";
+
+const router: Router = express.Router();
 
 /**
  * @route /cultivation/
  */
 
-export function indexEndpoint(req: Request, res: Response) {
+router.all('/', (req: Request, res: Response) => {
     res.send(DEFAULT_RESPONSE);
-}
+});
 
 /**
  * @route /cultivation/query/
  */
 
-export function queryEndpoint(req: Request, res: Response) {
+router.get('/query', async (req: Request, res: Response) => {
+    const bg_file = await getSetting("CULTIVATION_BGFILE");
+
     res.send(<CultivationQuery> {
-        bg_file: config.bgFile || "",
         version: cache.version,
-        commits: base64Encode(cache.commits)
+        commits: base64Encode(cache.commits),
+        bg_file
     });
-}
+});
+
+export default router;

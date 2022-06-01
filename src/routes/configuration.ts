@@ -1,6 +1,5 @@
 import {Request, Response} from "express";
 
-import * as config from "../config";
 import {writeFileSync} from "fs";
 
 /**
@@ -10,8 +9,8 @@ import {writeFileSync} from "fs";
 export function refreshEndpoint(req: Request, res: Response) {
     res.status(200).send({
         msg: "Refreshed configuration.",
-        config: config.loadConfig()
-    })
+        config: {}
+    });
 }
 
 /**
@@ -26,6 +25,6 @@ export function updateEndpoint(req: Request, res: Response) {
 
     res.status(200).send({
         msg: "Updated configuration.",
-        refreshed: req.query.refresh ? (config.loadConfig() != undefined) : false
+        refreshed: req.query.refresh ? {} : false
     });
 }
