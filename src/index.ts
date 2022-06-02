@@ -17,7 +17,7 @@ const app: Express = express();
 
 /* Configure middleware. */
 import * as bodyParser from "body-parser";
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: constants.MAX_BODY_SIZE}));
 
 import {validateAdminEndpoints} from "./middleware/adminValidator";
 app.use(validateAdminEndpoints);
