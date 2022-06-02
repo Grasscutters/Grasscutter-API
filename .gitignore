@@ -12,4 +12,5 @@ build/
 
 # Environment
 config.json
+bgfile.png
 .env
