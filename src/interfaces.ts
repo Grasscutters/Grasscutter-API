@@ -22,3 +22,7 @@ export interface CommitData {
     gc_dev: object[];
     cultivation: object[];
 }
+
+export interface BackgroundUpdate {
+    data: string; // Base64-encoded image.
+}
