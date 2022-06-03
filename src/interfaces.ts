@@ -1,5 +1,4 @@
 export interface CultivationQuery {
-    bg_file: string;
     commits: string; // Base64-encoded CommitData.
     version: VersionData;
 }
@@ -23,6 +22,12 @@ export interface CommitData {
     cultivation: object[];
 }
 
-export interface BackgroundUpdate {
-    data: string; // Base64-encoded image.
+export interface UploadData {
+    version?: string;
+    app?: string;
+}
+
+export interface GameData {
+    version: string;
+    download_url: string;
 }

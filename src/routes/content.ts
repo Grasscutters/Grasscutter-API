@@ -1,12 +1,21 @@
 import {Request, Response} from "express";
-import {DEFAULT_RESPONSE} from "../constants";
+import {ACCESS_DENIED, ALLOWED_IPS} from "../constants";
+
+import {config} from "../config";
+
+import {getAddress} from "../utils";
 
 /**
  * @route /content/
  */
 
 export function indexEndpoint(req: Request, res: Response) {
-    res.send(DEFAULT_RESPONSE);
+    // Check if the accessor is whitelisted.
+    if(!ALLOWED_IPS.includes(getAddress(req)))
+        return res.status(403).send(ACCESS_DENIED);
+
+    // Send the content.html file.
+    res.render("content");
 }
 
 /**
@@ -15,5 +24,6 @@ export function indexEndpoint(req: Request, res: Response) {
  */
 
 export function backgroundEndpoint(req: Request, res: Response) {
-    res.sendFile(`${process.cwd()}/bgfile.png`);
+    // Get the background file URL & redirect.
+    res.redirect(config.bgFileUrl);
 }

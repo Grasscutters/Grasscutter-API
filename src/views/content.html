@@ -1,0 +1,20 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Content Upload Area</title>
+    </head>
+
+    <body>
+        <form rel="uploadForm" id="uploadForm"
+          action="/configuration/upload"
+          method="post" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <input type="text" name="app" value="Application" />
+            <input type="text" name="version" value="Version Number" />
+            <input type="submit" value="Upload" />
+        </form>
+    </body>
+</html>

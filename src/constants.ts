@@ -1,6 +1,7 @@
 export const SERVER_PORT = process.env["HTTP-PORT"] || 6896;
 export const CONFIG_FILE = process.env["CONFIG-FILE"] || "config.json";
 export const MAX_BODY_SIZE = process.env["MAX-BODY-SIZE"] || "50mb";
+export const DOWNLOAD_DIRECTORY = process.env["DOWNLOAD-DIRECTORY"] || `${process.cwd()}/downloads`;
 export const ALLOWED_IPS = (() => {
     const ips = process.env["ALLOWED-IPS"];
     return ips ? ips.split(",") : [];
