@@ -2,8 +2,9 @@
 import "dotenv/config";
 
 /* Configure caching system. */
-import {refreshCache} from "./cache";
+import {refreshCache, refreshGameCache} from "./cache";
 refreshCache().then(() => setInterval(refreshCache, 1000 * 60 * 60));
+refreshGameCache();
 
 /* Load configuration. */
 require("./config").loadConfig();
@@ -15,15 +16,28 @@ import {createServer, Server} from "http";
 
 const app: Express = express();
 
+/* Configure views. */
+app.engine("html", require("ejs").renderFile);
+app.set("views", `${__dirname}/views`);
+app.set("view engine", "html");
+
 /* Configure middleware. */
 import * as bodyParser from "body-parser";
 app.use(bodyParser.json({limit: constants.MAX_BODY_SIZE}));
+
+import fileUpload from "express-fileupload";
+app.use(fileUpload());
 
 import {validateAdminEndpoints} from "./middleware/adminValidator";
 app.use(validateAdminEndpoints);
 
 /* Import the router. */
 require("./routes/router").configureApp(app);
+
+/* Check if directories exist. */
+import {existsSync, mkdirSync} from "fs";
+if(!existsSync(constants.DOWNLOAD_DIRECTORY))
+    mkdirSync(constants.DOWNLOAD_DIRECTORY, {recursive: true});
 
 /* Start HTTP server. */
 const server: Server = createServer(app);
