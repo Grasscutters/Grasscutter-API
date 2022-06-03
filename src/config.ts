@@ -1,4 +1,7 @@
 import {CONFIG_FILE} from "./constants";
+
+import {existsSync, writeFileSync} from "fs";
+
 export let config: Configuration = undefined;
 
 /**
@@ -6,10 +9,14 @@ export let config: Configuration = undefined;
  * @return The new configuration data.
  */
 export function loadConfig(): Configuration {
-    config = require(`${process.cwd()}/${CONFIG_FILE}`); return config;
+    const configFile: string = `${process.cwd()}/${CONFIG_FILE}`;
+    if(!existsSync(configFile))
+        writeFileSync(configFile, JSON.stringify({}));
+
+    config = require(configFile); return config;
 }
 
 export interface Configuration {
-    bgFile: string;
+    bgFileUrl: string;
     gameVersion: string;
 }
