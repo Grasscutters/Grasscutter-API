@@ -1,0 +1,39 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Content Upload Area</title>
+    </head>
+
+    <body>
+        <form rel="uploadForm" id="uploadForm"
+              action="/updater/publish"
+              method="post" enctype="multipart/form-data">
+
+            <!--
+            Required:
+            - application
+            - version
+            - notes
+            - signature?
+
+            Automatically computed:
+            - url
+            - md5/signature
+            - pub_date
+            - file
+            -->
+
+            <input type="file" name="file" />
+
+            <input type="text" name="software" value="Application" />
+            <input type="text" name="version" value="Application Version" />
+            <input type="text" name="notes" value="Patch Notes" />
+            <input type="text" name="signature" value="Signature (blank=auto)" />
+
+            <input type="submit" value="Upload" />
+        </form>
+    </body>
+</html>
