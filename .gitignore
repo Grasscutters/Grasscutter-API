@@ -1,0 +1,16 @@
+# Node Modules
+node_modules/
+
+# Binaries
+bin/
+
+# Builds
+build/
+
+# Testing
+.env
+game-data.json
+cultivation-data.json
+
+content/
+updates/

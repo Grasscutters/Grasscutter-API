@@ -1,0 +1,44 @@
+{
+  "name": "grasscutter-api",
+  "description": "The API for the Grasscutters.",
+  "version": "1.0.0",
+
+  "dependencies": {
+    "typescript": "^4.6.4",
+    "express": "^4.18.1",
+    "body-parser": "^1.20.0",
+    "dotenv": "^16.0.1",
+    "node-fetch": "^2.6.7",
+    "express-fileupload": "^1.4.0",
+    "ejs": "^3.1.8"
+  },
+
+  "devDependencies": {
+    "@types/node": "^17.0.35",
+    "@types/express": "^4.17.13",
+    "@types/node-fetch": "^2.6.1",
+    "@types/express-fileupload": "^1.2.2",
+
+    "@typescript-eslint/parser": "^5.26.0",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+
+    "eslint": "^8.16.0"
+  },
+
+  "main": "src/index.ts",
+  "scripts": {
+    "start:dev": "ts-node src/index.ts",
+    "start": "node build/index.js",
+    "package": "tsc && pkg --compress GZip ."
+  },
+
+  "bin": "build/index.js",
+  "pkg": {
+    "targets": [
+      "latest-linux-x64",
+      "latest-windows-x64"
+    ],
+    "assets": ["views/**/*"],
+    "outputPath": "bin"
+  }
+}
